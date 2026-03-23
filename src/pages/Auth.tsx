@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,16 +10,20 @@ import { toast } from "sonner";
 import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
 
 const Auth = () => {
+  const { session, loading: authLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  if (authLoading) return null;
+  if (session) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       if (isLogin) {
@@ -27,7 +33,7 @@ const Auth = () => {
       } else {
         if (!username.trim()) {
           toast.error("Username is required.");
-          setLoading(false);
+          setSubmitting(false);
           return;
         }
         const { error } = await supabase.auth.signUp({
@@ -44,7 +50,7 @@ const Auth = () => {
     } catch (error: any) {
       toast.error(error.message || "Authentication failed.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -158,10 +164,10 @@ const Auth = () => {
 
             <Button
               type="submit"
-              disabled={loading}
+              disabled={submitting}
               className="w-full font-mono text-xs tracking-wider"
             >
-              {loading ? (
+              {submitting ? (
                 <span className="animate-pulse">Authenticating...</span>
               ) : isLogin ? (
                 <>
