@@ -25,6 +25,7 @@ const TaskBoard = () => {
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [newTask, setNewTask] = useState({ title: "", project: "Website Builder", assigned_to: "Rin", priority: "medium" as Task["priority"], due_date: "" });
 
+
   const handleDragStart = (taskId: string) => setDraggedTask(taskId);
 
   const handleDrop = (column: Task["column"]) => {
