@@ -122,9 +122,9 @@ export const initialTasks: Task[] = [];
 
 export const initialLogEntries: LogEntry[] = [
   { id: "log-01", agent: "Rin", agentEmoji: "🥷", category: "observation", message: "Analyzing betting system architecture. Identified 3 potential API providers with real-time odds data.", timestamp: "2 min ago", read: false },
-  { id: "log-02", agent: "Sub-Agent-1", agentEmoji: "🔧", category: "task_update", message: "Website UI components 60% complete. Header, footer, and navigation done. Working on hero section.", timestamp: "5 min ago", read: false },
-  { id: "log-03", agent: "Rin", agentEmoji: "🥷", category: "question", message: "Sub-Agent-1 needs clarification on third-party API requirements for the betting data pipeline.", timestamp: "12 min ago", read: true },
-  { id: "log-04", agent: "Sub-Agent-2", agentEmoji: "📊", category: "observation", message: "Fetched competitor betting data from 47 sources. Compiling analysis report.", timestamp: "18 min ago", read: true },
+  { id: "log-02", agent: "Hinata", agentEmoji: "🔧", category: "task_update", message: "Website UI components 60% complete. Header, footer, and navigation done. Working on hero section.", timestamp: "5 min ago", read: false },
+  { id: "log-03", agent: "Rin", agentEmoji: "🥷", category: "question", message: "Hinata needs clarification on third-party API requirements for the betting data pipeline.", timestamp: "12 min ago", read: true },
+  { id: "log-04", agent: "Mikasa", agentEmoji: "📊", category: "observation", message: "Fetched competitor betting data from 47 sources. Compiling analysis report.", timestamp: "18 min ago", read: true },
   { id: "log-05", agent: "Rin", agentEmoji: "🥷", category: "general", message: "All agents synced. Task board updated with latest assignments. No blockers detected.", timestamp: "25 min ago", read: true },
   { id: "log-06", agent: "Sub-Agent-1", agentEmoji: "🔧", category: "task_update", message: "CI/CD pipeline configuration started. Using GitHub Actions with Docker.", timestamp: "30 min ago", read: true },
   { id: "log-07", agent: "Sub-Agent-2", agentEmoji: "📊", category: "general", message: "Research phase for website builders complete. Recommending Next.js + Supabase stack.", timestamp: "45 min ago", read: true },
