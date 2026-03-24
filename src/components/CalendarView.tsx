@@ -10,9 +10,9 @@ const eventColors: Record<string, string> = {
 };
 
 const kpis = [
-  { label: "Tasks Due This Week", value: 3, icon: CalendarDays },
-  { label: "Scheduled Runs", value: 4, icon: Repeat },
-  { label: "Next Deadline", value: "Mar 24", icon: Clock },
+  { label: "Tasks Due This Week", value: 0, icon: CalendarDays },
+  { label: "Scheduled Runs", value: 0, icon: Repeat },
+  { label: "Next Deadline", value: "None", icon: Clock },
 ];
 
 const CalendarView = () => {

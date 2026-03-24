@@ -4,11 +4,11 @@ import { agents, projects, activityFeed } from "@/data/mockData";
 import { Progress } from "@/components/ui/progress";
 
 const kpis = [
-  { label: "Tasks in Progress", value: 4, icon: Zap },
-  { label: "Completed This Week", value: 23, icon: CheckCircle },
-  { label: "Agents Online", value: "3/3", icon: Wifi },
-  { label: "Awaiting Input", value: 1, icon: AlertCircle },
-  { label: "Upcoming Deadlines", value: 2, icon: Clock },
+  { label: "Tasks in Progress", value: 0, icon: Zap },
+  { label: "Completed This Week", value: 0, icon: CheckCircle },
+  { label: "Agents Online", value: "0/3", icon: Wifi },
+  { label: "Awaiting Input", value: 0, icon: AlertCircle },
+  { label: "Upcoming Deadlines", value: 0, icon: Clock },
 ];
 
 const statusClass = (s: string) =>
