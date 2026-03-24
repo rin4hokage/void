@@ -112,9 +112,9 @@ export const agents: Agent[] = [
 ];
 
 export const projects = [
-  { name: "Website Builder", color: "#10b981", tasks: 6, progress: 45, agents: ["Rin", "Sub-Agent-1"], status: "active" as const },
-  { name: "Betting Research", color: "#06b6d4", tasks: 4, progress: 20, agents: ["Rin", "Sub-Agent-2"], status: "active" as const },
-  { name: "Infrastructure", color: "#f59e0b", tasks: 3, progress: 70, agents: ["Rin", "Sub-Agent-1"], status: "active" as const },
+  { name: "Website Builder", color: "#10b981", tasks: 6, progress: 45, agents: ["Rin", "Hinata"], status: "active" as const },
+  { name: "Betting Research", color: "#06b6d4", tasks: 4, progress: 20, agents: ["Rin", "Mikasa"], status: "active" as const },
+  { name: "Infrastructure", color: "#f59e0b", tasks: 3, progress: 70, agents: ["Rin", "Hinata"], status: "active" as const },
   { name: "System", color: "#6b7280", tasks: 2, progress: 90, agents: ["Rin"], status: "maintenance" as const },
 ];
 
