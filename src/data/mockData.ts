@@ -172,8 +172,8 @@ export const initialThreads: Thread[] = [
 
 export const calendarEvents: CalendarEvent[] = [
   { id: "ev-1", title: "Akatsuki Dashboard Due", type: "deadline", date: "2026-03-25", assignedTo: ["Rin", "Sub-Agent-1"] },
-  { id: "ev-2", title: "API Integration Complete", type: "deadline", date: "2026-03-26", assignedTo: ["Sub-Agent-2"] },
-  { id: "ev-3", title: "Landing Page Design", type: "deadline", date: "2026-03-24", assignedTo: ["Sub-Agent-1"] },
+  { id: "ev-2", title: "API Integration Complete", type: "deadline", date: "2026-03-26", assignedTo: ["Mikasa"] },
+  { id: "ev-3", title: "Landing Page Design", type: "deadline", date: "2026-03-24", assignedTo: ["Hinata"] },
   { id: "ev-4", title: "Daily Data Sync", type: "cron", date: "2026-03-22", assignedTo: ["Rin"] },
   { id: "ev-5", title: "Daily Data Sync", type: "cron", date: "2026-03-23", assignedTo: ["Rin"] },
   { id: "ev-6", title: "Daily Data Sync", type: "cron", date: "2026-03-24", assignedTo: ["Rin"] },
