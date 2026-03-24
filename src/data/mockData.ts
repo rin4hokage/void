@@ -115,20 +115,7 @@ export const projects: { name: string; color: string; tasks: number; progress: n
 
 export const initialTasks: Task[] = [];
 
-export const initialLogEntries: LogEntry[] = [
-  { id: "log-01", agent: "Rin", agentEmoji: "🥷", category: "observation", message: "Analyzing betting system architecture. Identified 3 potential API providers with real-time odds data.", timestamp: "2 min ago", read: false },
-  { id: "log-02", agent: "Hinata", agentEmoji: "🔧", category: "task_update", message: "Website UI components 60% complete. Header, footer, and navigation done. Working on hero section.", timestamp: "5 min ago", read: false },
-  { id: "log-03", agent: "Rin", agentEmoji: "🥷", category: "question", message: "Hinata needs clarification on third-party API requirements for the betting data pipeline.", timestamp: "12 min ago", read: true },
-  { id: "log-04", agent: "Mikasa", agentEmoji: "📊", category: "observation", message: "Fetched competitor betting data from 47 sources. Compiling analysis report.", timestamp: "18 min ago", read: true },
-  { id: "log-05", agent: "Rin", agentEmoji: "🥷", category: "general", message: "All agents synced. Task board updated with latest assignments. No blockers detected.", timestamp: "25 min ago", read: true },
-  { id: "log-06", agent: "Hinata", agentEmoji: "🔧", category: "task_update", message: "CI/CD pipeline configuration started. Using GitHub Actions with Docker.", timestamp: "30 min ago", read: true },
-  { id: "log-07", agent: "Mikasa", agentEmoji: "📊", category: "general", message: "Research phase for website builders complete. Recommending Next.js + Supabase stack.", timestamp: "45 min ago", read: true },
-  { id: "log-08", agent: "Rin", agentEmoji: "🥷", category: "task_update", message: "Moved 'Set up project repository' to Done. All repos initialized with proper configs.", timestamp: "1 hr ago", read: true },
-  { id: "log-09", agent: "Hinata", agentEmoji: "🔧", category: "error", message: "Build failed on landing page component — missing dependency. Resolved by adding framer-motion.", timestamp: "1.5 hr ago", read: true },
-  { id: "log-10", agent: "Rin", agentEmoji: "🥷", category: "observation", message: "Detected potential bottleneck in task pipeline. Mikasa idle for 15 min. Reassigning.", timestamp: "2 hr ago", read: true },
-  { id: "log-11", agent: "Mikasa", agentEmoji: "📊", category: "task_update", message: "Competitor analysis: 12 platforms reviewed, 5 with relevant API access. Report draft ready.", timestamp: "3 hr ago", read: true },
-  { id: "log-12", agent: "Rin", agentEmoji: "🥷", category: "general", message: "Morning sync complete. 3 agents online, 5 tasks in progress, 0 blockers.", timestamp: "4 hr ago", read: true },
-];
+export const initialLogEntries: LogEntry[] = [];
 
 export const initialThreads: Thread[] = [
   {
