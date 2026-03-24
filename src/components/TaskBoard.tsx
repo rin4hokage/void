@@ -75,8 +75,8 @@ const TaskBoard = () => {
             <SelectTrigger className="bg-muted/30 border-border text-sm h-8 w-[130px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="Rin">🥷 Rin</SelectItem>
-              <SelectItem value="Sub-Agent-1">🔧 Sub-1</SelectItem>
-              <SelectItem value="Sub-Agent-2">📊 Sub-2</SelectItem>
+              <SelectItem value="Hinata">🔧 Hinata</SelectItem>
+              <SelectItem value="Mikasa">📊 Mikasa</SelectItem>
             </SelectContent>
           </Select>
           <Select value={newTask.priority} onValueChange={(v) => setNewTask({ ...newTask, priority: v as Task["priority"] })}>
