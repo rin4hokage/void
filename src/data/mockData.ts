@@ -177,10 +177,10 @@ export const calendarEvents: CalendarEvent[] = [
   { id: "ev-4", title: "Daily Data Sync", type: "cron", date: "2026-03-22", assignedTo: ["Rin"] },
   { id: "ev-5", title: "Daily Data Sync", type: "cron", date: "2026-03-23", assignedTo: ["Rin"] },
   { id: "ev-6", title: "Daily Data Sync", type: "cron", date: "2026-03-24", assignedTo: ["Rin"] },
-  { id: "ev-7", title: "Weekly Report Generation", type: "cron", date: "2026-03-28", assignedTo: ["Sub-Agent-2"] },
-  { id: "ev-8", title: "DB Schema Review", type: "deadline", date: "2026-03-26", assignedTo: ["Rin", "Sub-Agent-1"] },
-  { id: "ev-9", title: "Competitor Report Due", type: "deadline", date: "2026-03-30", assignedTo: ["Sub-Agent-2"] },
-  { id: "ev-10", title: "Sub-Agent-2 Maintenance", type: "unavailable", date: "2026-03-27", assignedTo: ["Sub-Agent-2"] },
+  { id: "ev-7", title: "Weekly Report Generation", type: "cron", date: "2026-03-28", assignedTo: ["Mikasa"] },
+  { id: "ev-8", title: "DB Schema Review", type: "deadline", date: "2026-03-26", assignedTo: ["Rin", "Hinata"] },
+  { id: "ev-9", title: "Competitor Report Due", type: "deadline", date: "2026-03-30", assignedTo: ["Mikasa"] },
+  { id: "ev-10", title: "Mikasa Maintenance", type: "unavailable", date: "2026-03-27", assignedTo: ["Mikasa"] },
 ];
 
 export const activityFeed = [
