@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, KanbanSquare, GitBranch, Users, ScrollText, MessageCircle, Calendar, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { LayoutDashboard, KanbanSquare, GitBranch, Users, ScrollText, MessageCircle, Calendar } from "lucide-react";
 import CommandDeck from "@/components/CommandDeck";
 import TaskBoard from "@/components/TaskBoard";
 import PipelineView from "@/components/PipelineView";
@@ -9,7 +8,6 @@ import AgentProfiles from "@/components/AgentProfiles";
 import AILog from "@/components/AILog";
 import Comms from "@/components/Comms";
 import CalendarView from "@/components/CalendarView";
-import { Button } from "@/components/ui/button";
 
 const tabs = [
   { id: "command", label: "Command", icon: LayoutDashboard },
@@ -33,7 +31,6 @@ const tabComponents: Record<string, React.FC> = {
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("command");
-  const { signOut } = useAuth();
   const ActiveComponent = tabComponents[activeTab];
 
   return (
@@ -50,15 +47,6 @@ const Index = () => {
             </span>
             <span className="hidden md:block">Agents: <span className="text-primary">3 Active</span></span>
             <span className="hidden lg:block">Last Sync: <span className="text-foreground">now</span></span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={signOut}
-              className="text-muted-foreground hover:text-destructive h-7 px-2 gap-1"
-            >
-              <LogOut size={14} />
-              <span className="hidden sm:inline">Sign Out</span>
-            </Button>
           </div>
         </div>
       </header>

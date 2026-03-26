@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 const Comms = () => {
   const { tasks } = useTasks(5000);
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
   const { messages, sendMessage } = useComms(activeTaskId, 3000);
   const [input, setInput] = useState("");
 
@@ -14,7 +14,7 @@ const Comms = () => {
 
   const handleSend = async () => {
     if (!input.trim() || !activeTaskId) return;
-    await sendMessage(input, activeTaskId);
+    await sendMessage(input, activeTaskId!);
     setInput("");
   };
 

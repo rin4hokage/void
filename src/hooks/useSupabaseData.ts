@@ -1,62 +1,57 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 
 export interface DbTask {
-  id: string;
-  user_id: string;
+  id: number;
   title: string;
-  description: string;
+  description: string | null;
   status: string;
-  project_id: string | null;
-  assigned_to: string;
-  priority: string;
-  due_date: string | null;
+  project_id: number | null;
+  assigned_to: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface DbProject {
-  id: string;
-  user_id: string;
+  id: number;
   name: string;
-  description: string;
+  description: string | null;
   color: string;
   status: string;
+  created_by: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface DbComm {
-  id: string;
-  user_id: string;
-  task_id: string | null;
+  id: number;
+  task_id: number | null;
+  project_id: number | null;
   sender: string;
   message: string;
+  message_type: string;
   created_at: string;
 }
 
 export interface DbAgent {
   id: string;
-  user_id: string;
   name: string;
   status: string;
-  current_task_id: string | null;
+  current_task_id: number | null;
   last_activity: string | null;
-  created_at: string;
+  avatar_url: string | null;
 }
 
 export function useTasks(pollInterval = 5000) {
   const [tasks, setTasks] = useState<DbTask[]>([]);
-  const { user } = useAuth();
 
   const fetchTasks = useCallback(async () => {
-    if (!user) return;
     const { data } = await supabase
       .from("tasks")
       .select("*")
       .order("created_at", { ascending: false });
     if (data) setTasks(data as DbTask[]);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     fetchTasks();
@@ -65,23 +60,22 @@ export function useTasks(pollInterval = 5000) {
   }, [fetchTasks, pollInterval]);
 
   const addTask = async (task: Partial<DbTask>) => {
-    if (!user) return;
     const { data, error } = await supabase
       .from("tasks")
-      .insert({ ...task, user_id: user.id } as any)
+      .insert(task as any)
       .select()
       .single();
     if (data && !error) setTasks((prev) => [data as DbTask, ...prev]);
     return { data, error };
   };
 
-  const updateTask = async (id: string, updates: Partial<DbTask>) => {
+  const updateTask = async (id: number, updates: Partial<DbTask>) => {
     const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
     if (!error) setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
     return { error };
   };
 
-  const deleteTask = async (id: string) => {
+  const deleteTask = async (id: number) => {
     const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (!error) setTasks((prev) => prev.filter((t) => t.id !== id));
   };
@@ -91,33 +85,30 @@ export function useTasks(pollInterval = 5000) {
 
 export function useProjects() {
   const [projects, setProjects] = useState<DbProject[]>([]);
-  const { user } = useAuth();
 
   const fetchProjects = useCallback(async () => {
-    if (!user) return;
     const { data } = await supabase
       .from("projects")
       .select("*")
       .order("created_at", { ascending: false });
     if (data) setProjects(data as DbProject[]);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
   const addProject = async (project: Partial<DbProject>) => {
-    if (!user) return;
     const { data, error } = await supabase
       .from("projects")
-      .insert({ ...project, user_id: user.id } as any)
+      .insert(project as any)
       .select()
       .single();
     if (data && !error) setProjects((prev) => [data as DbProject, ...prev]);
     return { data, error };
   };
 
-  const updateProject = async (id: string, updates: Partial<DbProject>) => {
+  const updateProject = async (id: number, updates: Partial<DbProject>) => {
     const { error } = await supabase.from("projects").update(updates as any).eq("id", id);
     if (!error) setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   };
@@ -125,19 +116,18 @@ export function useProjects() {
   return { projects, fetchProjects, addProject, updateProject };
 }
 
-export function useComms(taskId: string | null, pollInterval = 3000) {
+export function useComms(taskId: number | null, pollInterval = 3000) {
   const [messages, setMessages] = useState<DbComm[]>([]);
-  const { user } = useAuth();
 
   const fetchMessages = useCallback(async () => {
-    if (!user || !taskId) { setMessages([]); return; }
+    if (!taskId) { setMessages([]); return; }
     const { data } = await supabase
       .from("comms")
       .select("*")
       .eq("task_id", taskId)
       .order("created_at", { ascending: true });
     if (data) setMessages(data as DbComm[]);
-  }, [user, taskId]);
+  }, [taskId]);
 
   useEffect(() => {
     fetchMessages();
@@ -145,11 +135,10 @@ export function useComms(taskId: string | null, pollInterval = 3000) {
     return () => clearInterval(interval);
   }, [fetchMessages, pollInterval]);
 
-  const sendMessage = async (message: string, taskId: string) => {
-    if (!user) return;
+  const sendMessage = async (message: string, taskId: number) => {
     const { data, error } = await supabase
       .from("comms")
-      .insert({ user_id: user.id, task_id: taskId, sender: "EJ", message } as any)
+      .insert({ task_id: taskId, sender: "EJ", message, message_type: "text" } as any)
       .select()
       .single();
     if (data && !error) setMessages((prev) => [...prev, data as DbComm]);
@@ -161,16 +150,13 @@ export function useComms(taskId: string | null, pollInterval = 3000) {
 
 export function useAgents(pollInterval = 10000) {
   const [agents, setAgents] = useState<DbAgent[]>([]);
-  const { user } = useAuth();
 
   const fetchAgents = useCallback(async () => {
-    if (!user) return;
     const { data } = await supabase
       .from("agents")
-      .select("*")
-      .order("created_at", { ascending: true });
+      .select("*");
     if (data) setAgents(data as DbAgent[]);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     fetchAgents();
@@ -189,11 +175,8 @@ export function useDashboardStats() {
     totalAgents: 0,
     awaitingInput: 0,
   });
-  const { user } = useAuth();
 
   const fetchStats = useCallback(async () => {
-    if (!user) return;
-
     const [doingRes, doneRes, inputRes, agentsRes] = await Promise.all([
       supabase.from("tasks").select("id", { count: "exact", head: true }).eq("status", "doing"),
       supabase.from("tasks").select("id", { count: "exact", head: true }).eq("status", "done")
@@ -210,7 +193,7 @@ export function useDashboardStats() {
       totalAgents: agentList.length,
       awaitingInput: inputRes.count || 0,
     });
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     fetchStats();
