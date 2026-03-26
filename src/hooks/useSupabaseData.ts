@@ -8,8 +8,8 @@ export interface DbTask {
   title: string;
   description: string;
   status: string;
-  project: string;
-  assignee: string;
+  project_id: string | null;
+  assigned_to: string;
   priority: string;
   due_date: string | null;
   created_at: string;
