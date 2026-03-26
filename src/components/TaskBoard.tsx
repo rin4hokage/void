@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTasks } from "@/hooks/useSupabaseData";
+import { useTasks, useProjects } from "@/hooks/useSupabaseData";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const columns = [
   { id: "todo", label: "To Do" },
@@ -37,20 +38,24 @@ const statusCycle: Record<string, string> = {
 
 const TaskBoard = () => {
   const { tasks, addTask, updateTask } = useTasks(5000);
-  const [newTask, setNewTask] = useState({ title: "", project: "", assignee: "Rin", priority: "medium", due_date: "" });
+  const { projects } = useProjects();
+  const [newTask, setNewTask] = useState({ title: "", description: "", assigned_to: "", project_id: "", priority: "medium" });
+
+  // Build project name lookup
+  const projectNameMap: Record<string, string> = {};
+  projects.forEach((p) => { projectNameMap[p.id] = p.name; });
 
   const createTask = async () => {
     if (!newTask.title.trim()) return;
     await addTask({
       title: newTask.title,
-      project: newTask.project || "",
-      assignee: newTask.assignee,
+      description: newTask.description,
+      assigned_to: newTask.assigned_to,
+      project_id: newTask.project_id || null,
       priority: newTask.priority,
       status: "todo",
-      due_date: newTask.due_date || null,
-      description: "",
     });
-    setNewTask({ title: "", project: "", assignee: "Rin", priority: "medium", due_date: "" });
+    setNewTask({ title: "", description: "", assigned_to: "", project_id: "", priority: "medium" });
   };
 
   const cycleStatus = async (taskId: string, currentStatus: string) => {
@@ -63,6 +68,7 @@ const TaskBoard = () => {
 
   return (
     <div className="flex flex-col gap-4 h-full">
+      {/* Create Task Form */}
       <div className="glass-card p-3">
         <div className="flex items-center gap-2 flex-wrap">
           <Input
@@ -73,17 +79,26 @@ const TaskBoard = () => {
             className="bg-muted/30 border-border text-sm h-8 flex-1 min-w-[150px]"
           />
           <Input
-            placeholder="Project..."
-            value={newTask.project}
-            onChange={(e) => setNewTask({ ...newTask, project: e.target.value })}
-            className="bg-muted/30 border-border text-sm h-8 w-[140px]"
+            placeholder="Description..."
+            value={newTask.description}
+            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+            className="bg-muted/30 border-border text-sm h-8 w-[180px]"
           />
-          <Select value={newTask.assignee} onValueChange={(v) => setNewTask({ ...newTask, assignee: v })}>
-            <SelectTrigger className="bg-muted/30 border-border text-sm h-8 w-[130px]"><SelectValue /></SelectTrigger>
+          <Input
+            placeholder="Assigned to..."
+            value={newTask.assigned_to}
+            onChange={(e) => setNewTask({ ...newTask, assigned_to: e.target.value })}
+            className="bg-muted/30 border-border text-sm h-8 w-[130px]"
+          />
+          <Select value={newTask.project_id} onValueChange={(v) => setNewTask({ ...newTask, project_id: v })}>
+            <SelectTrigger className="bg-muted/30 border-border text-sm h-8 w-[160px]">
+              <SelectValue placeholder="Project..." />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Rin">🥷 Rin</SelectItem>
-              <SelectItem value="Hinata">🔧 Hinata</SelectItem>
-              <SelectItem value="Mikasa">📊 Mikasa</SelectItem>
+              <SelectItem value="">No Project</SelectItem>
+              {projects.filter((p) => p.status === "active").map((p) => (
+                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={newTask.priority} onValueChange={(v) => setNewTask({ ...newTask, priority: v })}>
@@ -95,18 +110,13 @@ const TaskBoard = () => {
               <SelectItem value="low">⚪ Low</SelectItem>
             </SelectContent>
           </Select>
-          <Input
-            type="date"
-            value={newTask.due_date}
-            onChange={(e) => setNewTask({ ...newTask, due_date: e.target.value })}
-            className="bg-muted/30 border-border text-sm h-8 w-[140px]"
-          />
           <Button onClick={createTask} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm h-8 px-4">
             Create
           </Button>
         </div>
       </div>
 
+      {/* Kanban Columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 overflow-x-auto">
         {columns.map((col) => {
           const colTasks = sortedTasks(tasks.filter((t) => t.status === col.id));
@@ -136,10 +146,13 @@ const TaskBoard = () => {
                         <span className="priority-dot mt-1" style={{ backgroundColor: priorityColors[task.priority] || "#6b7280" }} />
                         <span className="text-sm font-semibold leading-tight">{task.title}</span>
                       </div>
+                      {task.description && (
+                        <p className="text-[10px] text-muted-foreground mb-1 ml-4">{task.description}</p>
+                      )}
                       <div className="flex items-center gap-2 flex-wrap">
-                        {task.project && (
+                        {task.project_id && projectNameMap[task.project_id] && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded font-mono text-muted-foreground bg-muted/50">
-                            {task.project}
+                            {projectNameMap[task.project_id]}
                           </span>
                         )}
                         {task.due_date && (
@@ -148,9 +161,11 @@ const TaskBoard = () => {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 mt-2">
-                        <span className="text-[10px] text-muted-foreground">{task.assignee}</span>
-                      </div>
+                      {task.assigned_to && (
+                        <div className="flex items-center gap-1 mt-2">
+                          <span className="text-[10px] text-muted-foreground">{task.assigned_to}</span>
+                        </div>
+                      )}
                     </motion.div>
                   ))}
                 </AnimatePresence>
