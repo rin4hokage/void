@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+const TASK_RETENTION_HOURS = 24;
+const LOG_RETENTION_HOURS = 48;
+
 export interface DbTask {
   id: string;
   user_id: string;
@@ -80,7 +83,24 @@ export function useTasks(pollInterval = 5000) {
       .from("tasks")
       .select("*")
       .order("created_at", { ascending: false });
-    if (data) setTasks(data as DbTask[]);
+    if (data) {
+      const now = Date.now();
+      const expiredTasks = (data as DbTask[]).filter((task) => {
+        if (task.status !== "done") return false;
+        const completedAt = new Date(task.updated_at).getTime();
+        return now - completedAt >= TASK_RETENTION_HOURS * 60 * 60 * 1000;
+      });
+
+      if (expiredTasks.length > 0) {
+        await Promise.all(
+          expiredTasks.map((task) => supabase.from("tasks").delete().eq("id", task.id))
+        );
+      }
+
+      setTasks(
+        (data as DbTask[]).filter((task) => !expiredTasks.some((expiredTask) => expiredTask.id === task.id))
+      );
+    }
   }, [user]);
 
   useEffect(() => {
@@ -313,7 +333,23 @@ export function useActivityLogs(pollInterval = 5000) {
       .order("created_at", { ascending: false })
       .limit(100);
 
-    if (data) setLogs(data as DbActivityLog[]);
+    if (data) {
+      const now = Date.now();
+      const expiredLogs = (data as DbActivityLog[]).filter((entry) => {
+        const createdAt = new Date(entry.created_at).getTime();
+        return now - createdAt >= LOG_RETENTION_HOURS * 60 * 60 * 1000;
+      });
+
+      if (expiredLogs.length > 0) {
+        await Promise.all(
+          expiredLogs.map((entry) => supabase.from("activity_logs").delete().eq("id", entry.id))
+        );
+      }
+
+      setLogs(
+        (data as DbActivityLog[]).filter((entry) => !expiredLogs.some((expiredLog) => expiredLog.id === entry.id))
+      );
+    }
   }, [user]);
 
   useEffect(() => {

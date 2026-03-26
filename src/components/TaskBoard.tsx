@@ -5,6 +5,7 @@ import { useTasks, useProjects, useAgents } from "@/hooks/useSupabaseData";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const columns = [
   { id: "todo", label: "To Do" },
@@ -68,6 +69,8 @@ const TaskBoard = () => {
   };
 
   const cycleStatus = async (taskId: string, currentStatus: string) => {
+    if (currentStatus === "done") return;
+
     const next = statusCycle[currentStatus] || "todo";
     const { error } = await updateTask(taskId, { status: next });
 
@@ -79,23 +82,23 @@ const TaskBoard = () => {
   return (
     <div className="flex flex-col gap-4 h-full">
       {/* Create Task Form */}
-      <div className="glass-card p-3">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="glass-card p-4">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(320px,1.5fr)_minmax(300px,1fr)_160px_170px_auto] gap-3 items-start">
           <Input
             placeholder="Task title..."
             value={newTask.title}
             onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
             onKeyDown={(e) => e.key === "Enter" && createTask()}
-            className="bg-muted/30 border-border text-sm h-8 flex-1 min-w-[150px]"
+            className="bg-muted/30 border-border text-sm h-12 w-full"
           />
-          <Input
+          <Textarea
             placeholder="Description..."
             value={newTask.description}
             onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-            className="bg-muted/30 border-border text-sm h-8 w-[180px]"
+            className="bg-muted/30 border-border text-sm min-h-[96px] w-full resize-y"
           />
           <Select value={newTask.assigned_to} onValueChange={(v) => setNewTask({ ...newTask, assigned_to: v })}>
-            <SelectTrigger className="bg-muted/30 border-border text-sm h-8 w-[150px]">
+            <SelectTrigger className="bg-muted/30 border-border text-sm h-12 w-full">
               <SelectValue placeholder="Assign agent..." />
             </SelectTrigger>
             <SelectContent>
@@ -106,7 +109,7 @@ const TaskBoard = () => {
             </SelectContent>
           </Select>
           <Select value={newTask.project_id} onValueChange={(v) => setNewTask({ ...newTask, project_id: v })}>
-            <SelectTrigger className="bg-muted/30 border-border text-sm h-8 w-[160px]">
+            <SelectTrigger className="bg-muted/30 border-border text-sm h-12 w-full">
               <SelectValue placeholder="Project..." />
             </SelectTrigger>
             <SelectContent>
@@ -116,7 +119,7 @@ const TaskBoard = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={createTask} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm h-8 px-4">
+          <Button onClick={createTask} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm h-12 px-5 self-stretch">
             + Task
           </Button>
         </div>
@@ -146,7 +149,7 @@ const TaskBoard = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       onClick={() => cycleStatus(task.id, task.status)}
-                      className="glass-card-hover p-3 cursor-pointer"
+                      className={`glass-card-hover p-3 ${task.status === "done" ? "cursor-default opacity-80" : "cursor-pointer"}`}
                     >
                       <span className="text-sm font-semibold leading-tight block mb-1">{task.title}</span>
                       {task.description && (
