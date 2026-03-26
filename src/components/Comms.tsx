@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 const Comms = () => {
   const { tasks } = useTasks(5000);
-  const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const { messages, sendMessage } = useComms(activeTaskId, 3000);
   const [input, setInput] = useState("");
 
@@ -14,36 +14,34 @@ const Comms = () => {
 
   const handleSend = async () => {
     if (!input.trim() || !activeTaskId) return;
-    await sendMessage(input, activeTaskId!);
+    await sendMessage(input, activeTaskId);
     setInput("");
   };
 
   return (
     <div className="flex h-[60vh] gap-4">
-      {/* Task list sidebar */}
       <div className="w-full sm:w-64 glass-card p-3 space-y-1 overflow-y-auto flex-shrink-0">
         {tasks.length === 0 && (
           <div className="text-center py-8 text-muted-foreground text-xs font-mono">No tasks yet. Create tasks in the Tasks tab.</div>
         )}
-        {tasks.map((t) => (
+        {tasks.map((task) => (
           <div
-            key={t.id}
-            onClick={() => setActiveTaskId(t.id)}
+            key={task.id}
+            onClick={() => setActiveTaskId(task.id)}
             className={`p-2.5 rounded-md cursor-pointer transition-colors ${
-              t.id === activeTaskId ? "bg-muted/50 border-l-2 border-l-primary" : "hover:bg-muted/30"
+              task.id === activeTaskId ? "bg-muted/50 border-l-2 border-l-primary" : "hover:bg-muted/30"
             }`}
           >
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold truncate">{t.title}</span>
+              <span className="text-sm font-semibold truncate">{task.title}</span>
             </div>
             <p className="text-[10px] text-muted-foreground truncate mt-1">
-              {t.status} · {t.assigned_to || "Unassigned"}
+              {task.status} | {task.assigned_to || "Unassigned"}
             </p>
           </div>
         ))}
       </div>
 
-      {/* Message thread */}
       <div className="flex-1 glass-card flex flex-col hidden sm:flex">
         {activeTask ? (
           <>
@@ -56,23 +54,23 @@ const Comms = () => {
               {messages.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground text-xs font-mono">No messages yet.</div>
               )}
-              {messages.map((msg, i) => (
+              {messages.map((message, index) => (
                 <motion.div
-                  key={msg.id}
+                  key={message.id}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02 }}
-                  className={`flex gap-2 ${msg.sender === "EJ" ? "justify-end" : ""}`}
+                  transition={{ delay: index * 0.02 }}
+                  className={`flex gap-2 ${message.sender === "EJ" ? "justify-end" : ""}`}
                 >
-                  <div className={`max-w-[75%]`}>
-                    <div className={`rounded-lg p-2.5 text-xs ${msg.sender === "EJ" ? "bg-primary/20 text-foreground" : "bg-muted/50 text-foreground"}`}>
-                      {msg.sender !== "EJ" && (
-                        <span className="text-[10px] font-semibold text-primary block mb-1">{msg.sender}</span>
+                  <div className="max-w-[75%]">
+                    <div className={`rounded-lg p-2.5 text-xs ${message.sender === "EJ" ? "bg-primary/20 text-foreground" : "bg-muted/50 text-foreground"}`}>
+                      {message.sender !== "EJ" && (
+                        <span className="text-[10px] font-semibold text-primary block mb-1">{message.sender}</span>
                       )}
-                      {msg.message}
+                      {message.message}
                     </div>
                     <span className="text-[9px] text-muted-foreground font-mono mt-0.5 block">
-                      {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
                 </motion.div>

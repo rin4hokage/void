@@ -29,10 +29,10 @@ const statusCycle: Record<string, string> = {
 const TaskBoard = () => {
   const { tasks, addTask, updateTask } = useTasks(5000);
   const { projects } = useProjects();
-  const [newTask, setNewTask] = useState({ title: "", description: "", assigned_to: "", project_id: "" });
+  const [newTask, setNewTask] = useState({ title: "", description: "", assigned_to: "", project_id: "none" });
 
   // Build project name lookup
-  const projectNameMap: Record<number, string> = {};
+  const projectNameMap: Record<string, string> = {};
   projects.forEach((p) => { projectNameMap[p.id] = p.name; });
 
   const createTask = async () => {
@@ -41,13 +41,13 @@ const TaskBoard = () => {
       title: newTask.title,
       description: newTask.description || null,
       assigned_to: newTask.assigned_to || null,
-      project_id: newTask.project_id ? parseInt(newTask.project_id) : null,
+      project_id: newTask.project_id && newTask.project_id !== "none" ? newTask.project_id : null,
       status: "todo",
     });
-    setNewTask({ title: "", description: "", assigned_to: "", project_id: "" });
+    setNewTask({ title: "", description: "", assigned_to: "", project_id: "none" });
   };
 
-  const cycleStatus = async (taskId: number, currentStatus: string) => {
+  const cycleStatus = async (taskId: string, currentStatus: string) => {
     const next = statusCycle[currentStatus] || "todo";
     await updateTask(taskId, { status: next });
   };
@@ -81,7 +81,7 @@ const TaskBoard = () => {
               <SelectValue placeholder="Project..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No Project</SelectItem>
+              <SelectItem value="none">No Project</SelectItem>
               {projects.filter((p) => p.status === "active").map((p) => (
                 <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
               ))}
@@ -130,7 +130,7 @@ const TaskBoard = () => {
                           </span>
                         )}
                         {task.assigned_to && (
-                          <span className="text-[10px] text-muted-foreground">→ {task.assigned_to}</span>
+                          <span className="text-[10px] text-muted-foreground">-&gt; {task.assigned_to}</span>
                         )}
                       </div>
                       <p className="text-[9px] text-muted-foreground/50 mt-1 font-mono">

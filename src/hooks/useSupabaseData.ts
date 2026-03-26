@@ -1,57 +1,76 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface DbTask {
-  id: number;
+  id: string;
+  user_id: string;
   title: string;
   description: string | null;
   status: string;
-  project_id: number | null;
+  project_id: string | null;
   assigned_to: string | null;
+  due_date: string | null;
+  priority: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface DbProject {
-  id: number;
+  id: string;
+  user_id: string;
   name: string;
   description: string | null;
   color: string;
   status: string;
-  created_by: string | null;
   created_at: string;
-  updated_at: string;
 }
 
 export interface DbComm {
-  id: number;
-  task_id: number | null;
-  project_id: number | null;
+  id: string;
+  user_id: string;
+  task_id: string | null;
   sender: string;
   message: string;
-  message_type: string;
   created_at: string;
 }
 
 export interface DbAgent {
   id: string;
+  user_id: string;
   name: string;
   status: string;
-  current_task_id: number | null;
+  current_task_id: string | null;
   last_activity: string | null;
-  avatar_url: string | null;
+  created_at: string;
+}
+
+export interface DbScheduledRun {
+  id: string;
+  user_id: string;
+  title: string;
+  cron_expression: string;
+  next_run_at: string | null;
+  active: boolean;
+  created_at: string;
 }
 
 export function useTasks(pollInterval = 5000) {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState<DbTask[]>([]);
 
   const fetchTasks = useCallback(async () => {
+    if (!user) {
+      setTasks([]);
+      return;
+    }
+
     const { data } = await supabase
       .from("tasks")
       .select("*")
       .order("created_at", { ascending: false });
     if (data) setTasks(data as DbTask[]);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchTasks();
@@ -60,22 +79,24 @@ export function useTasks(pollInterval = 5000) {
   }, [fetchTasks, pollInterval]);
 
   const addTask = async (task: Partial<DbTask>) => {
+    if (!user) return { data: null, error: new Error("You must be signed in to create tasks.") };
+
     const { data, error } = await supabase
       .from("tasks")
-      .insert(task as any)
+      .insert({ ...task, user_id: user.id } as never)
       .select()
       .single();
     if (data && !error) setTasks((prev) => [data as DbTask, ...prev]);
     return { data, error };
   };
 
-  const updateTask = async (id: number, updates: Partial<DbTask>) => {
-    const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
+  const updateTask = async (id: string, updates: Partial<DbTask>) => {
+    const { error } = await supabase.from("tasks").update(updates as never).eq("id", id);
     if (!error) setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
     return { error };
   };
 
-  const deleteTask = async (id: number) => {
+  const deleteTask = async (id: string) => {
     const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (!error) setTasks((prev) => prev.filter((t) => t.id !== id));
   };
@@ -84,50 +105,60 @@ export function useTasks(pollInterval = 5000) {
 }
 
 export function useProjects() {
+  const { user } = useAuth();
   const [projects, setProjects] = useState<DbProject[]>([]);
 
   const fetchProjects = useCallback(async () => {
+    if (!user) {
+      setProjects([]);
+      return;
+    }
+
     const { data } = await supabase
       .from("projects")
       .select("*")
       .order("created_at", { ascending: false });
     if (data) setProjects(data as DbProject[]);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
   const addProject = async (project: Partial<DbProject>) => {
+    if (!user) return { data: null, error: new Error("You must be signed in to create projects.") };
+
     const { data, error } = await supabase
       .from("projects")
-      .insert(project as any)
+      .insert({ ...project, user_id: user.id } as never)
       .select()
       .single();
     if (data && !error) setProjects((prev) => [data as DbProject, ...prev]);
     return { data, error };
   };
 
-  const updateProject = async (id: number, updates: Partial<DbProject>) => {
-    const { error } = await supabase.from("projects").update(updates as any).eq("id", id);
+  const updateProject = async (id: string, updates: Partial<DbProject>) => {
+    const { error } = await supabase.from("projects").update(updates as never).eq("id", id);
     if (!error) setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    return { error };
   };
 
   return { projects, fetchProjects, addProject, updateProject };
 }
 
-export function useComms(taskId: number | null, pollInterval = 3000) {
+export function useComms(taskId: string | null, pollInterval = 3000) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<DbComm[]>([]);
 
   const fetchMessages = useCallback(async () => {
-    if (!taskId) { setMessages([]); return; }
+    if (!user || !taskId) { setMessages([]); return; }
     const { data } = await supabase
       .from("comms")
       .select("*")
       .eq("task_id", taskId)
       .order("created_at", { ascending: true });
     if (data) setMessages(data as DbComm[]);
-  }, [taskId]);
+  }, [taskId, user]);
 
   useEffect(() => {
     fetchMessages();
@@ -135,10 +166,12 @@ export function useComms(taskId: number | null, pollInterval = 3000) {
     return () => clearInterval(interval);
   }, [fetchMessages, pollInterval]);
 
-  const sendMessage = async (message: string, taskId: number) => {
+  const sendMessage = async (message: string, activeTaskId: string) => {
+    if (!user) return { data: null, error: new Error("You must be signed in to send messages.") };
+
     const { data, error } = await supabase
       .from("comms")
-      .insert({ task_id: taskId, sender: "EJ", message, message_type: "text" } as any)
+      .insert({ task_id: activeTaskId, user_id: user.id, sender: "EJ", message } as never)
       .select()
       .single();
     if (data && !error) setMessages((prev) => [...prev, data as DbComm]);
@@ -149,14 +182,20 @@ export function useComms(taskId: number | null, pollInterval = 3000) {
 }
 
 export function useAgents(pollInterval = 10000) {
+  const { user } = useAuth();
   const [agents, setAgents] = useState<DbAgent[]>([]);
 
   const fetchAgents = useCallback(async () => {
+    if (!user) {
+      setAgents([]);
+      return;
+    }
+
     const { data } = await supabase
       .from("agents")
       .select("*");
     if (data) setAgents(data as DbAgent[]);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchAgents();
@@ -168,6 +207,7 @@ export function useAgents(pollInterval = 10000) {
 }
 
 export function useDashboardStats() {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     tasksInProgress: 0,
     completedThisWeek: 0,
@@ -177,6 +217,17 @@ export function useDashboardStats() {
   });
 
   const fetchStats = useCallback(async () => {
+    if (!user) {
+      setStats({
+        tasksInProgress: 0,
+        completedThisWeek: 0,
+        agentsOnline: 0,
+        totalAgents: 0,
+        awaitingInput: 0,
+      });
+      return;
+    }
+
     const [doingRes, doneRes, inputRes, agentsRes] = await Promise.all([
       supabase.from("tasks").select("id", { count: "exact", head: true }).eq("status", "doing"),
       supabase.from("tasks").select("id", { count: "exact", head: true }).eq("status", "done")
@@ -193,7 +244,7 @@ export function useDashboardStats() {
       totalAgents: agentList.length,
       awaitingInput: inputRes.count || 0,
     });
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchStats();
@@ -202,4 +253,29 @@ export function useDashboardStats() {
   }, [fetchStats]);
 
   return stats;
+}
+
+export function useScheduledRuns() {
+  const { user } = useAuth();
+  const [scheduledRuns, setScheduledRuns] = useState<DbScheduledRun[]>([]);
+
+  const fetchScheduledRuns = useCallback(async () => {
+    if (!user) {
+      setScheduledRuns([]);
+      return;
+    }
+
+    const { data } = await supabase
+      .from("scheduled_runs")
+      .select("*")
+      .order("next_run_at", { ascending: true, nullsFirst: false });
+
+    if (data) setScheduledRuns(data as DbScheduledRun[]);
+  }, [user]);
+
+  useEffect(() => {
+    fetchScheduledRuns();
+  }, [fetchScheduledRuns]);
+
+  return { scheduledRuns, fetchScheduledRuns };
 }
