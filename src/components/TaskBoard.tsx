@@ -30,7 +30,7 @@ const statusCycle: Record<string, string> = {
 const TaskBoard = () => {
   const { tasks, addTask, updateTask } = useTasks(5000);
   const { projects } = useProjects();
-  const { agents } = useAgents();
+  const { agents, updateAgent } = useAgents();
   const [newTask, setNewTask] = useState({ title: "", description: "", assigned_to: "unassigned", project_id: "none" });
 
   // Build project name lookup
@@ -40,17 +40,27 @@ const TaskBoard = () => {
   const createTask = async () => {
     if (!newTask.title.trim()) return;
 
-    const { error } = await addTask({
+    const { data, error } = await addTask({
       title: newTask.title,
       description: newTask.description || null,
       assigned_to: newTask.assigned_to !== "unassigned" ? newTask.assigned_to : null,
       project_id: newTask.project_id && newTask.project_id !== "none" ? newTask.project_id : null,
       status: "todo",
+      pipeline_phase: newTask.assigned_to !== "unassigned" ? 2 : 1,
     });
 
     if (error) {
       toast.error(error.message || "Task could not be saved.");
       return;
+    }
+
+    const selectedAgent = agents.find((agent) => agent.name === newTask.assigned_to);
+    if (selectedAgent && data) {
+      await updateAgent(selectedAgent.id, {
+        current_task_id: data.id,
+        last_activity: new Date().toISOString(),
+        status: "working",
+      });
     }
 
     toast.success("Task saved.");

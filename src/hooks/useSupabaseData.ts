@@ -8,6 +8,7 @@ export interface DbTask {
   title: string;
   description: string | null;
   status: string;
+  pipeline_phase: number;
   project_id: string | null;
   assigned_to: string | null;
   due_date: string | null;
@@ -203,7 +204,13 @@ export function useAgents(pollInterval = 10000) {
     return () => clearInterval(interval);
   }, [fetchAgents, pollInterval]);
 
-  return { agents, fetchAgents };
+  const updateAgent = async (id: string, updates: Partial<DbAgent>) => {
+    const { error } = await supabase.from("agents").update(updates as never).eq("id", id);
+    if (!error) setAgents((prev) => prev.map((agent) => (agent.id === id ? { ...agent, ...updates } : agent)));
+    return { error };
+  };
+
+  return { agents, fetchAgents, updateAgent };
 }
 
 export function useDashboardStats() {
