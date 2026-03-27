@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@400;500;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,29 +6,32 @@
 
 @layer base {
   :root {
-    --background: 0 0% 5%;
+    --background: 0 0% 2%;
     --foreground: 0 0% 96%;
-    --card: 0 0% 8%;
+    --card: 0 0% 4%;
     --card-foreground: 0 0% 96%;
-    --popover: 0 0% 8%;
+    --popover: 0 0% 4%;
     --popover-foreground: 0 0% 96%;
-    --primary: 354 81% 44%;
+    --primary: 205 28% 56%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 14%;
+    --secondary: 0 0% 7%;
     --secondary-foreground: 0 0% 94%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 62%;
-    --accent: 355 75% 22%;
+    --muted: 0 0% 6%;
+    --muted-foreground: 0 0% 68%;
+    --accent: 214 18% 16%;
     --accent-foreground: 0 0% 96%;
     --destructive: 0 75% 46%;
     --destructive-foreground: 0 0% 96%;
-    --border: 0 0% 100% / 0.08;
-    --input: 0 0% 100% / 0.1;
-    --ring: 354 81% 44%;
+    --border: 0 0% 100% / 0.07;
+    --input: 0 0% 100% / 0.08;
+    --ring: 205 28% 56%;
     --radius: 1.25rem;
-    --blood: 354 81% 44%;
-    --blood-dark: 354 82% 28%;
-    --blood-light: 3 100% 80%;
+    --blood: 205 28% 56%;
+    --blood-dark: 211 25% 32%;
+    --blood-light: 205 33% 80%;
+    --obsidian: 0 0% 3%;
+    --obsidian-soft: 0 0% 5%;
+    --champagne: 210 18% 88%;
   }
 
   * {
@@ -43,37 +46,171 @@
     @apply bg-background text-foreground antialiased;
     font-family: "Space Grotesk", sans-serif;
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 90px 90px;
+      radial-gradient(circle at 14% 7%, rgba(78, 112, 142, 0.11), transparent 18%),
+      radial-gradient(circle at 80% 0%, rgba(228, 236, 244, 0.04), transparent 12%),
+      radial-gradient(circle at 50% 100%, rgba(46, 61, 74, 0.12), transparent 26%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.016), transparent 14%),
+      linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      linear-gradient(180deg, #040405 0%, #020203 55%, #000000 100%);
+    background-size: auto, auto, auto, auto, 92px 92px, 92px 92px, auto;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 10%),
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent 35%);
+    mix-blend-mode: screen;
+    opacity: 0.35;
   }
 }
 
 @layer components {
   .font-display {
     font-family: "Antonio", sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  .font-alt {
+    font-family: "Syne", sans-serif;
+    letter-spacing: 0.02em;
   }
 
   .vault-panel {
-    @apply rounded-[2rem] border border-white/10 bg-black/45 shadow-2xl backdrop-blur-md;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    @apply rounded-[2rem] border border-white/10 shadow-2xl backdrop-blur-md;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012) 10%, rgba(0, 0, 0, 0.8) 100%),
+      radial-gradient(circle at top left, rgba(83, 108, 128, 0.08), transparent 24%),
+      linear-gradient(140deg, rgba(9, 9, 10, 0.97), rgba(3, 3, 4, 0.99) 54%, rgba(7, 6, 7, 1));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 -24px 48px rgba(0, 0, 0, 0.42),
+      0 18px 50px rgba(0, 0, 0, 0.62),
+      0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+
+  .bleed-panel {
+    background:
+      radial-gradient(circle at top, rgba(88, 109, 128, 0.1), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 14%),
+      linear-gradient(180deg, rgba(6, 6, 7, 0.96), rgba(2, 2, 2, 1));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 26px 70px rgba(0, 0, 0, 0.7);
   }
 
   .tag-pill {
-    @apply rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/70 transition;
+    @apply rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/70 transition;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+      rgba(8, 8, 11, 0.88);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
   .tag-pill:hover {
-    @apply border-white/25 bg-white/10 text-white;
+    @apply border-white/25 text-white;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03)),
+      rgba(10, 10, 14, 0.92);
   }
 
   .tag-pill-active {
-    background: linear-gradient(135deg, hsl(var(--blood-dark)), hsl(var(--blood)));
+    background:
+      linear-gradient(135deg, rgba(42, 55, 70, 0.95), rgba(103, 133, 160, 0.96)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
     @apply border-transparent text-white;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 10px 28px rgba(44, 56, 70, 0.25);
   }
 
   .field-input {
-    @apply w-full rounded-[1.2rem] border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition placeholder:text-white/35 focus:border-red-500/60 focus:ring-2 focus:ring-red-500/20;
+    @apply w-full rounded-[1.2rem] border border-white/10 px-4 py-3 text-white outline-none transition placeholder:text-white/35 focus:border-sky-300/30 focus:ring-2 focus:ring-sky-200/10;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+      rgba(7, 7, 10, 0.92);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      inset 0 -12px 20px rgba(0, 0, 0, 0.18);
+  }
+
+  .cutout-button {
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  }
+
+  .buy-button {
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 12px 30px rgba(45, 56, 70, 0.22);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      filter 180ms ease;
+  }
+
+  .buy-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.24) 45%, transparent 65%);
+    transform: translateX(-130%);
+    transition: transform 420ms ease;
+  }
+
+  .buy-button:hover {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 18px 38px rgba(45, 56, 70, 0.3);
+    filter: saturate(1.02) brightness(1.03);
+  }
+
+  .buy-button:hover::before {
+    transform: translateX(130%);
+  }
+
+  .header-shell {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.008)),
+      rgba(2, 2, 3, 0.86);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 10px 30px rgba(0, 0, 0, 0.42);
+  }
+
+  .ghost-luxe {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+      rgba(5, 5, 6, 0.86);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  }
+
+  .brand-mark {
+    color: hsl(var(--champagne));
+    text-shadow:
+      0 0 24px rgba(233, 240, 246, 0.08),
+      0 0 40px rgba(93, 120, 145, 0.1);
+  }
+
+  .editorial-input {
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .editorial-input:focus {
+    border-bottom-color: rgba(240, 225, 214, 0.95);
+    box-shadow: none;
   }
 }
 
